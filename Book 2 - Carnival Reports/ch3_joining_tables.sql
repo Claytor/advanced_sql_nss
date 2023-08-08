@@ -28,10 +28,8 @@ LEFT JOIN salestypes st
 SELECT 
 	s.invoice_number AS invoice,
 	v.vin,
-	c.first_name AS cust_first,
-	c.last_name AS cust_last,
-	e.first_name AS emp_first,
-	e.last_name AS emp_last,
+	c.first_name || ' ' || c.last_name AS customer,
+	e.first_name || ' ' || e.last_name AS employee,
 	d.business_name AS dealership,
 	d.city,
 	d.state
@@ -45,16 +43,35 @@ LEFT JOIN employees e
 	ON s.employee_id = e.employee_id
 LEFT JOIN dealerships d
 	ON s.dealership_id = d.dealership_id
+ORDER BY
+	s.invoice_number;
 
 
 /*3.  Get a list of all the dealerships and the employees, if any, working at each one.
 */
+SELECT
+	d.business_name AS dealership,
+	e.first_name || ' ' || e.last_name AS employee	
+FROM 
+	dealershipemployees de
+LEFT JOIN 
+	employees e
+		ON de.employee_id = e.employee_id
+LEFT JOIN
+	dealerships d
+		ON de.dealership_id = d.dealership_id
+ORDER BY 
+	d.business_name; 
+
 /*4.  Get a list of vehicles with the names of the body type, make, model and color.*/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
+SELECT
+	vt.body_type AS body, 
+	vt.make,
+	vt.model,
+	v.exterior_color AS exterior,
+	v.interior_color AS interior
+FROM
+	vehicles v
+LEFT JOIN vehicletypes vt
+	on v.vehicle_type_id = vt.vehicle_type_id
+ORDER BY vt.body_type;
