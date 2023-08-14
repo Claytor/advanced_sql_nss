@@ -75,8 +75,6 @@ LEFT JOIN salestypes st
 	ON s.sales_type_id = st.sales_type_id
 Left JOIN dealerships d
 	ON s.dealership_id = d.dealership_id
-WHERE
-	s.sales_type_id IN (1, 2)
 GROUP BY
 	d.business_name
 ORDER BY
@@ -118,7 +116,8 @@ ORDER BY sales DESC
 LIMIT 1;
 
 /*Who Sold What 2 - Which employee type sold the most of that make?*/
--- McLelland and Succamore are tied with 4 each
+-- McLelland and Succamore are tied with 4 each.  
+-- About 67% of all dealership employees have sold a Nissan.
 SELECT
 	e.first_name ||' '|| e.last_name AS employee,
 	COUNT(s.sales_type_id)
