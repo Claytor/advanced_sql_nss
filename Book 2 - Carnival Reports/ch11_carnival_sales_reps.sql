@@ -51,11 +51,30 @@ ORDER BY "Finance Managers"
 -- ========================================
 
 -- Get the names of the top 3 employees who work shifts at the most dealerships.
--- ...
-
+-- Can't directly answer the question, Top Employee works 3 sites.  27 employees work 2 sites.
+SELECT 
+	e.first_name ||' '|| e.last_name AS "Employee",
+	COUNT (DISTINCT de.dealership_id) AS "Worksites"
+FROM dealershipemployees de
+JOIN employees e ON de.employee_id = e.employee_id
+GROUP BY e.first_name, e.last_name
+ORDER BY "Worksites" DESC
+;
 -- ========================================
 -- Top 2 employees with most sales through leasing vehicles
 -- ========================================
 
 -- Get a report on the top two employees who have made the most sales through leasing vehicles.
--- ...
+/* Kyle Corssen mad the most lease sales, with a count of 9.Boote Chittock was in second with 8 lease transactions.  However, Boote but generated $51,275.75 more than Kyle.
+*/
+SELECT 
+	e.first_name ||' '|| e.last_name AS "Employee",
+	COUNT(s.sale_id) AS "Leases",
+	'$' || TO_CHAR(SUM(s.price), 'FM999,999.00') AS "Lease Revenue"
+FROM sales s
+LEFT JOIN employees as e ON s.employee_id = e.employee_id
+WHERE s.sales_type_id = 2
+GROUP BY e.first_name, e.last_name
+ORDER BY "Leases" DESC
+LIMIT 2
+;
