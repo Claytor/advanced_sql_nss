@@ -24,15 +24,15 @@ WITH dms AS
 	WHERE s.sale_returned = FALSE
 	GROUP BY s.dealership_id, d.business_name
 ),
--- Ranked non-returned sales per employee per dealership CTE
+-- Ranked non-returned gross sales per employee per dealership CTE
 d_rank AS
 (
 	SELECT
 		s.dealership_id,
 		s.employee_id,
 		e.first_name ||' '|| e.last_name AS top_seller,
-		COUNT(s.sale_id) AS transactions,
-		ROW_NUMBER() OVER(PARTITION BY s.dealership_id ORDER BY COUNT(s.sale_id) DESC) AS rank
+		SUM(s.price) AS transactions,
+		ROW_NUMBER() OVER(PARTITION BY s.dealership_id ORDER BY SUM(s.price) DESC) AS rank
 	FROM sales s
 	LEFT JOIN employees e ON s.employee_id = e.employee_id
 	WHERE s.sale_returned = FALSE
@@ -70,7 +70,7 @@ order_type AS
 SELECT
 	d.business_name AS "Top 5 Dealerships",
 	d.avg_spe AS "Per-Employee Transaction Mean",
-	r.top_seller AS "Top Performing Employee by Sales Volume",
+	r.top_seller AS "Top Performing Employee by Sales Revenue",
 	tm.model AS "Most Popular Car Model",
 	ot.transaction AS "Top Transaction Type"
 FROM dms d
@@ -79,3 +79,5 @@ LEFT JOIN top_model AS tm ON d.dealership_id = tm.dealership_id AND tm.rank = 1
 LEFT JOIN order_type AS ot ON d.dealership_id = ot.dealership_id and ot.rank = 1
 ORDER BY d.avg_spe DESC
 LIMIT 5;
+
+	
