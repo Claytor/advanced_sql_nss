@@ -32,7 +32,6 @@ GROUP BY et.employee_type_name
 -- ========================================
 -- Count of finance managers at each dealership
 -- ========================================
-
 -- How many finance managers work at each dealership?
 -- Staffing for the role ranges from 0 to 7
 -- There are two dealerships that do not have finance managers!
