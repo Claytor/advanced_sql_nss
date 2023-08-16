@@ -3,7 +3,7 @@
 -- ========================================
 
 /*
-In this section, I will generate reports on the performance and distribution of employees within the Carnival platform.
+In this section, I will generate reports on the performance and distribution of employees within the Carnival Cars Database.
 */
 
 -- ========================================
@@ -19,6 +19,7 @@ LEFT JOIN employeetypes et
 	ON e.employee_type_id = et.employee_type_id
 GROUP BY et.employee_type_name
 ;
+
 /*
 "Business Development"	149
 "Customer Service"	150
@@ -33,8 +34,18 @@ GROUP BY et.employee_type_name
 -- ========================================
 
 -- How many finance managers work at each dealership?
--- ...
-
+-- Staffing for the role ranges from 0 to 7
+-- There are two dealerships that do not have finance managers!
+SELECT 
+	d.business_name AS Dealership,
+	SUM(CASE WHEN et.employee_type_name = 'Finance Manager' THEN 1 ELSE 0 END) AS "Finance Managers"
+FROM employees e
+LEFT JOIN dealershipemployees de ON e.employee_id = de.employee_id
+LEFT JOIN dealerships d ON de.dealership_id = d.dealership_id
+LEFT JOIN employeetypes et ON e.employee_type_id = et.employee_type_id
+GROUP BY d.business_name
+ORDER BY "Finance Managers"
+;
 -- ========================================
 -- Top 3 employees working at the most dealerships
 -- ========================================
