@@ -52,8 +52,8 @@ JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
 JOIN dealerships d ON s.dealership_id = d.dealership_id
 WHERE v.is_sold = TRUE AND s.sales_type_id = 1
 GROUP BY d.business_name
-ORDER BY COUNT(vt.model)
-LIMIT 1
+ORDER BY "Unique Models Sold"
+LIMIT 3
 ;
 
 /*
