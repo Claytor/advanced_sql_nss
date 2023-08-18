@@ -88,7 +88,7 @@ FROM
 WHERE
 	s.sales_type_id = 2;
 
--- lases where the purchase date is within the last 5 years:  662 Sales
+-- sales where the purchase date is within the last 5 years:  662 Sales
 SELECT
 	*
 FROM
