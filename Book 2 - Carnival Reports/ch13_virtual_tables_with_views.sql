@@ -34,7 +34,7 @@ CREATE VIEW position_staffing AS
 	LEFT JOIN employeetypes et
 		ON e.employee_type_id = et.employee_type_id
 	GROUP BY et.employee_type_name
-	;
+;
 
 -- ========================================
 -- Redacted Customer List
@@ -53,12 +53,37 @@ CREATE VIEW customer_list AS
 -- ========================================
 
 -- Create a view named sales2018 that shows the total number of sales for each sales type for the year 2018.
--- ...
-
+CREATE VIEW sales2018 AS
+	SELECT 
+		st.sales_type_name AS "Sales Type", 
+		COUNT(s.sales_type_id) AS "Total Sales"
+	FROM sales s
+	LEFT JOIN salestypes st ON s.sales_type_id = st.sales_type_id
+	WHERE EXTRACT(YEAR FROM s.purchase_date) = 2018
+	GROUP BY st.sales_type_name
+;
 -- ========================================
 -- Top Salesperson at Each Dealership
 -- ========================================
-
--- Create a view that shows the employee at each dealership 
--- with the most number of sales.
--- ...
+select* from sales;
+-- Create a view that shows the employee at each dealership with the highest number of sales.
+CREATE VIEW dealership_top_sellers AS
+	WITH ranked_sales AS
+	(
+		SELECT
+			s.dealership_id,
+			e.first_name || ' ' || e.last_name AS employee_name,
+			SUM(s.price) AS sales_amount,
+			ROW_NUMBER() OVER(PARTITION BY s.dealership_id ORDER BY COUNT(s.price) DESC) AS rank
+		FROM sales s
+		LEFT JOIN employees e ON s.employee_id = e.employee_id
+		WHERE s.sale_returned = FALSE
+		GROUP BY s.dealership_id, e.first_name, e.last_name
+	)
+	SELECT
+		d.business_name AS "Dealership",
+		rs.employee_name AS "Top Employee",
+		'$' || TO_CHAR(rs.sales_amount, 'FM999,999.00') AS "Total Sales"
+	FROM ranked_sales rs
+	LEFT JOIN dealerships d ON rs.dealership_id = d.dealership_id
+	WHERE rs.rank = 1;
