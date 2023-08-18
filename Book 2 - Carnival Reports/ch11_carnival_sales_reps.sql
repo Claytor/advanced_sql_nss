@@ -11,13 +11,14 @@ In this section, I will generate reports on the performance and distribution of 
 -- ========================================
 
 -- How many employees are there for each role?
-SELECT
-	et.employee_type_name AS "Role",
-	COUNT (DISTINCT e.employee_id) "Staffing"
-FROM employees AS e
-LEFT JOIN employeetypes et
-	ON e.employee_type_id = et.employee_type_id
-GROUP BY et.employee_type_name
+CREATE VIEW employee_count_by_role AS 	
+	SELECT
+		et.employee_type_name AS "Role",
+		COUNT (DISTINCT e.employee_id) "Staffing"
+	FROM employees AS e
+	LEFT JOIN employeetypes et
+		ON e.employee_type_id = et.employee_type_id
+	GROUP BY et.employee_type_name
 ;
 
 /*
@@ -66,14 +67,25 @@ ORDER BY "Worksites" DESC
 -- Get a report on the top two employees who have made the most sales through leasing vehicles.
 /* Kyle Corssen mad the most lease sales, with a count of 9.Boote Chittock was in second with 8 lease transactions.  However, Boote but generated $51,275.75 more than Kyle.
 */
+CREATE VIEW view_top_leasing_employees AS
+	SELECT
+		d.business_name AS "Dealership",
+		COUNT (DISTINCT vt.model) AS "Unique Models Sold"
+	FROM sales s
+	JOIN vehicles v ON s.vehicle_id = v.vehicle_id
+	JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
+	JOIN dealerships d ON s.dealership_id = d.dealership_id
+	WHERE v.is_sold = TRUE AND s.sales_type_id = 1
+	GROUP BY d.business_name
+	ORDER BY COUNT(vt.model) DESC
+;
 SELECT 
-	e.first_name ||' '|| e.last_name AS "Employee",
-	COUNT(s.sale_id) AS "Leases",
-	'$' || TO_CHAR(SUM(s.price), 'FM999,999.00') AS "Lease Revenue"
-FROM sales s
-LEFT JOIN employees as e ON s.employee_id = e.employee_id
-WHERE s.sales_type_id = 2
-GROUP BY e.first_name, e.last_name
-ORDER BY "Leases" DESC
-LIMIT 2
+		e.first_name ||' '|| e.last_name AS "Employee",
+		COUNT(s.sale_id) AS "Leases",
+		'$' || TO_CHAR(SUM(s.price), 'FM999,999.00') AS "Lease Revenue"
+	FROM sales s
+	LEFT JOIN employees as e ON s.employee_id = e.employee_id
+	WHERE s.sales_type_id = 2
+	GROUP BY e.first_name, e.last_name
+	ORDER BY "Leases" DESC
 ;
