@@ -73,4 +73,5 @@ CREATE VIEW total_combined_income_per_employee AS
 	LEFT JOIN employees e ON s.employee_id = e.employee_id
 	WHERE sales_type_id IN (1,2) 
 	GROUP BY e.last_name, e.first_name
-	ORDER BY e.last_name;
+	ORDER BY e.last_name
+	;

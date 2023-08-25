@@ -19,6 +19,7 @@ SELECT
 FROM sales s
 LEFT JOIN employees e 
 	ON s.employee_id = e.employee_id
+WHERE s.sale_returned = FALSE
 GROUP BY e.first_name, e.last_name
 ORDER BY "Total Revenue" DESC
 LIMIT 5
@@ -30,8 +31,9 @@ SELECT
 FROM sales s
 LEFT JOIN dealerships d 
 	ON s.dealership_id = d.dealership_id
+WHERE s.sale_returned = FALSE
 GROUP BY d.business_name
-ORDER BY "business_name" DESC
+ORDER BY "Dealership Revenue" DESC
 LIMIT 5
 ;
 
@@ -50,6 +52,7 @@ SELECT
 FROM sales s
 LEFT JOIN model m
 	ON s.vehicle_id = m.vehicle_id
+WHERE s.sale_returned = FALSE
 GROUP BY m.model
 ORDER BY SUM(s.price) DESC
 LIMIT 5
@@ -87,28 +90,35 @@ ORDER BY d.business_name
 -- These queries shed light on the current state of the vehicle inventory, categorized by different parameters.
 
 -- 5. In our Vehicle inventory, show the count of each Model that is in stock.
--- Query will count vehicles in stock for each model.
-
+SELECT
+	vt.model AS "Vehicle Model",
+	COUNT(v.vehicle_id) AS "Inventory"
+FROM vehicles v
+LEFT JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
+WHERE v.is_sold = FALSE
+GROUP BY vt.model
+ORDER BY COUNT(v.vehicle_id) DESC
+;
 -- 6. In our Vehicle inventory, show the count of each Make that is in stock.
-	SELECT
-		vt.make AS "Vehicle Make",
-		COUNT(v.vehicle_id) AS "Inventory"
-	FROM vehicles v
-	LEFT JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
-	WHERE v.is_sold = FALSE
-	GROUP BY vt.make
-	ORDER BY COUNT(v.vehicle_id) DESC
+SELECT
+	vt.make AS "Vehicle Make",
+	COUNT(v.vehicle_id) AS "Inventory"
+FROM vehicles v
+LEFT JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
+WHERE v.is_sold = FALSE
+GROUP BY vt.make
+ORDER BY COUNT(v.vehicle_id) DESC
 ;
 
 -- 7. In our Vehicle inventory, show the count of each BodyType that is in stock.
-	SELECT
-		vt.body_type AS "Body Types",
-		COUNT(v.vehicle_id) AS "Inventory"
-	FROM vehicles v
-	LEFT JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
-	WHERE v.is_sold = FALSE
-	GROUP BY vt.body_type
-	ORDER BY COUNT(v.vehicle_id) DESC
+SELECT
+	vt.body_type AS "Body Types",
+	COUNT(v.vehicle_id) AS "Inventory"
+FROM vehicles v
+LEFT JOIN vehicletypes vt ON v.vehicle_type_id = vt.vehicle_type_id
+WHERE v.is_sold = FALSE
+GROUP BY vt.body_type
+ORDER BY COUNT(v.vehicle_id) DESC
 ;
 -- ========================================
 -- PURCHASING POWER REPORT
@@ -127,18 +137,17 @@ GROUP BY c.state
 ORDER BY AVG(s.price) DESC
 LIMIT 1
 ;
-select * from sales
 -- 9. Now using the data determined above, which 5 states have the customers with the highest average purchase price for a vehicle?
 
 SELECT
 	c.state AS "Customer Home State",
-	ROW_NUMBER() OVER(PARTITION BY c.state ORDER BY AVG(s.price)
+	ROUND(AVG(s.price),2) AS "Average Purchase Price"
 FROM sales s
 LEFT JOIN customers c ON s.customer_id = c.customer_id
 LEFT JOIN dealerships d ON s.dealership_id = d.dealership_id
 WHERE s.sales_type_id = 1
 GROUP BY c.state
---ORDER BY AVG(s.price) DESC
+ORDER BY "Average Purchase Price" DESC
 LIMIT 5
 ;
 -- Query will rank the top 5 states based on the average purchase price of vehicles by customers.
