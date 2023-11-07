@@ -24,4 +24,10 @@ WHERE s.invoice_number = '2436217483'
 An employee was recently fired so we must delete them from our database. Delete the employee with employee_id of 35. What problems might you run into when deleting? How would you recommend fixing it?
 */
 
-select * from 
+/*This operation violates the foreign key constrains because employee_id is referenced in 'dealership_employees' as well.  I believe ON DELETE CASCADE should fix the issue.
+*/
+
+DELETE FROM employees e
+WHERE e.employee_id = '35'
+
+select * from dealershipemployees
