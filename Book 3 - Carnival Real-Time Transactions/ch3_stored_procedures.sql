@@ -6,35 +6,48 @@
 -- Example: If the price of a vehicle with ID 5 is $10,000 and you pass in 10 as the percentage,
 -- the new price should be updated to $11,000.
 
-/*
 CREATE OR REPLACE PROCEDURE UpdateVehiclePrice(p_vehicle_id INT, p_percentage FLOAT)
-LANGUAGE plpgsql AS
-$$
+LANGUAGE plpgsql 
+AS $$
 BEGIN
-    -- Your code here
+    -- Calculate new price and update
+    UPDATE vehicles
+    SET floor_price = floor_price * (1 + p_percentage / 100)
+    WHERE vehicle_id = p_vehicle_id;
 END;
-$$
-*/
+$$;
+
+-- Call Procedure - update price of vehicle_id 1 by 10%
+CALL UpdateVehiclePrice(1, 10);
+
+-- See if the changes worked (GREAT SUCCESS!)
+select* from vehicles where vehicle_id = 1;
 
 -- ========================================
 -- PRACTICE PROBLEM 2: Calculate Employee Sales Total
 -- ========================================
+
 -- Create a stored procedure that accepts an employee_id.
 -- The procedure should return the total sales made by that employee.
 -- Additionally, consider providing a message indicating if the employee has outstanding, average, or below average sales,
 -- based on the sales total.
 
-/*
 CREATE OR REPLACE PROCEDURE CalculateEmployeeSalesTotal(p_employee_id INT)
 LANGUAGE plpgsql AS
 $$
 DECLARE
-    total_sales FLOAT;
+    total_sales FLOAT; -- Variable to hold total sales per employee
+	avg_sales FLOAT; -- Variable to hold average of all sales
+	high_threshold FLOAT; -- Variable for high sales threshold 
+	low_threshold FLOAT; -- Variable for low sales threshold
 BEGIN
-    -- Your code here
-END;
-$$
-*/
+-- Calculating total sales for given employee
+	SELECT SUM(price) INTO total_sales
+	From sales
+	WHERE employee_id = p_employee_id
+-- Calculating average sales
+
+
 
 -- ========================================
 -- PRACTICE PROBLEM 3: Lease Duration Update
