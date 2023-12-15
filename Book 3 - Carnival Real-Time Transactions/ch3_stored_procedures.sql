@@ -29,11 +29,11 @@ select* from vehicles where vehicle_id = 1;
 
 -- Create a stored procedure that accepts an employee_id.
 -- The procedure should return the total sales made by that employee.
--- Additionally, consider providing a message indicating if the employee has outstanding, average, or below average sales,
--- based on the sales total.
+-- Additionally, consider providing a message indicating if the employee has outstanding, average, or below average sales, based on the sales total.
 
-CREATE OR REPLACE PROCEDURE CalculateEmployeeSalesTotal(p_employee_id INT) RETURNS FLOAT AS
-LANGUAGE plpgsql AS
+-- MY NOTES:  Procedures do not return values, I instead wrote a function to accomplish this objective
+
+CREATE OR REPLACE FUNCTION CalculateEmployeeSalesTotal(p_employee_id INT) RETURNS FLOAT AS
 $$
 DECLARE
     total_sales FLOAT; -- Variable to hold total sales per employee
@@ -69,9 +69,13 @@ BEGIN
 	END IF;
 	RETURN total_sales;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
+-- Testing Function
+SELECT CalculateEmployeeSalesTotal(0)
 
+-- It works!!  Check "messages tab"
+select * from sales
 
 -- ========================================
 -- PRACTICE PROBLEM 3: Lease Duration Update
@@ -81,7 +85,7 @@ $$;
 -- The procedure should update the duration of the lease for that specific sale entry. 
 -- Include error handling for cases where the sale_id does not exist or is not a lease.
 
-/*
+
 CREATE OR REPLACE PROCEDURE UpdateLeaseDuration(p_sale_id INT, p_months INT)
 LANGUAGE plpgsql AS
 $$
@@ -89,6 +93,6 @@ BEGIN
     -- Your code here
 END;
 $$
-*/
+
 
 
