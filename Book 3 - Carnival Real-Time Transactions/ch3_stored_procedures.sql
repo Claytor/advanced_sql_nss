@@ -32,7 +32,7 @@ select* from vehicles where vehicle_id = 1;
 -- Additionally, consider providing a message indicating if the employee has outstanding, average, or below average sales,
 -- based on the sales total.
 
-CREATE OR REPLACE PROCEDURE CalculateEmployeeSalesTotal(p_employee_id INT)
+CREATE OR REPLACE PROCEDURE CalculateEmployeeSalesTotal(p_employee_id INT) RETURNS FLOAT AS
 LANGUAGE plpgsql AS
 $$
 DECLARE
@@ -42,10 +42,34 @@ DECLARE
 	low_threshold FLOAT; -- Variable for low sales threshold
 BEGIN
 -- Calculating total sales for given employee
-	SELECT SUM(price) INTO total_sales
-	From sales
-	WHERE employee_id = p_employee_id
+	SELECT COALESCE(SUM(price), 0) INTO total_sales -- Using COALESCE to avoid null value errors
+	FROM sales
+	WHERE employee_id = p_employee_id;
+	
 -- Calculating average sales
+	SELECT COALESCE(AVG(price), 0) INTO avg_sales
+	FROM sales;
+	
+-- Assinging thresholds based on calculated average sales
+	high_threshold := avg_sales * 1.20; -- 20% above average
+	low_threshold := avg_sales * 0.80; -- 20% below average
+	
+-- Making message for total sales and performance thresholds
+	RAISE NOTICE 'Total Sales for Employee %: %', p_employee_id, total_sales;
+	
+-- Logic for performance notices
+	IF total_sales = 0 THEN
+		RAISE NOTICE 'No sales data for employee %.', p_employee_id;
+	ELSIF total_sales > high_threshold THEN
+		RAISE NOTICE 'Outstanding Sales';
+	ELSIF total_sales >= low_threshold AND total_sales <= high_threshold THEN
+		RAISE NOTICE 'Average Sales';
+	ELSE
+		RAISE NOTICE 'Below Average Sales';
+	END IF;
+	RETURN total_sales;
+END;
+$$;
 
 
 
